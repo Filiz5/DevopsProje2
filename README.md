@@ -1,7 +1,7 @@
-##This project tried parameters with main.tf without using a Jenkinsfile. 
+## This project tried parameters with main.tf without using a Jenkinsfile. 
 I used the choice parameter. To destroy the resources we created, I used a boolean parameter. I wrote code in the shell execution so that if this parameter is selected, it will not apply.
 
-###The command to be written in the execute shell is as follows:
+### The command to be written in the execute shell is as follows:
 
 
 WORKSPACE_NAME=$(basename "$WORKSPACE")
