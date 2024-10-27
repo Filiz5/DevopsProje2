@@ -1,40 +1,40 @@
 terraform {
-    required_providers {
+  required_providers {
     aws = {
-        source = "hashicorp/aws"
-        version = "5.65.0"
+      source  = "hashicorp/aws"
+      version = "5.65.0"
     }
 
     github = {
-        source = "integrations/github"
-        version = "6.2.3"
+      source  = "integrations/github"
+      version = "6.2.3"
     }
-    }
+  }
 }
 
 provider "aws" {
-    region = "us-east-1"
+  region = "us-east-1"
 }
 
 resource "aws_security_group" "brc-sg" {
-    name = "${terraform.workspace}-sg"
-    tags = {
-        Name = "${terraform.workspace}-sg"
-    }
+  name = "${terraform.workspace}-sg"
+  tags = {
+    Name = "${terraform.workspace}-sg"
+  }
 
-    ingress {
-        from_port = 22
-        protocol = "tcp"
-        to_port = 22
-        cidr_blocks = [ "0.0.0.0/0" ]
-    }
+  ingress {
+    from_port   = 22
+    protocol    = "tcp"
+    to_port     = 22
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-    egress {
-        from_port = 0
-        protocol = -1
-        to_port = 0
-        cidr_blocks = [ "0.0.0.0/0" ]
-    }
+  egress {
+    from_port   = 0
+    protocol    = -1
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 variable "ins-ami" {
@@ -57,7 +57,6 @@ variable "ins-type" {
   }
 }
 
-
 variable "volume-size" {
   type = map(string)
   default = {
@@ -67,7 +66,6 @@ variable "volume-size" {
     test    = "16"
   }
 }
-
 
 variable "keypair" {
   type = map(string)
@@ -79,11 +77,10 @@ variable "keypair" {
   }
 }
 
-
 resource "aws_instance" "tfmyec2" {
   ami             = lookup(var.ins-ami, terraform.workspace)
-  instance_type   = var.ins-type[terraform.workspace]  # lookup dışında bu şekilde de kullanılabilir
-  count           = "${terraform.workspace == "prod" ? 3 : 1}"
+  instance_type   = var.ins-type[terraform.workspace]
+  count           = terraform.workspace == "prod" ? 3 : 1
   key_name        = var.keypair[terraform.workspace]
   security_groups = [aws_security_group.brc-sg.name]
 
@@ -96,12 +93,7 @@ resource "aws_instance" "tfmyec2" {
   }
 }
 
-
 output "workspace_instance_ip" {
-  description = "Public IP"
-  value       = "${terraform.workspace}-instance ip: ${aws_instance.tfmyec2.public_ip}"
+  description = "Public IPs of instances"
+  value       = [for instance in aws_instance.tfmyec2 : instance.public_ip]
 }
-
-
-
-
