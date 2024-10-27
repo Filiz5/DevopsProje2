@@ -34,7 +34,6 @@ resource "aws_security_group" "brc-sg" {
 variable "ins_ami" {}
 variable "ins_type" {}
 variable "keypair" {}
-
 resource "aws_instance" "tfmyec2" {
   ami = var.ins_ami
   instance_type = var.ins_type  #lookup haricinde bu sekilde de kullanilabilir, ornek olmasi icin yaptim
